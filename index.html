@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>PRAMUKA RPG ADVENTURE</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f5f1e8;
+      color: #222;
+    }
+
+    header {
+      padding: 30px 20px;
+      text-align: center;
+      background: #ffffff;
+      border-bottom: 1px solid #ddd;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 28px;
+    }
+
+    header p {
+      margin: 8px 0 0;
+      color: #666;
+    }
+
+    main {
+      max-width: 1000px;
+      margin: auto;
+      padding: 25px 15px;
+    }
+
+    .status {
+      background: white;
+      padding: 15px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+    }
+
+    .student {
+      background: white;
+      padding: 18px;
+      margin-bottom: 12px;
+      border-radius: 12px;
+      border: 1px solid #ddd;
+    }
+
+    .student h3 {
+      margin: 0 0 8px;
+    }
+
+    .exp {
+      font-weight: bold;
+      font-size: 18px;
+    }
+
+    .error {
+      color: #b00020;
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <h1>🏕️ PRAMUKA RPG ADVENTURE</h1>
+  <p>Petualangan, EXP, Level & Gelar Pramuka</p>
+</header>
+
+<main>
+
+  <div class="status" id="status">
+    Menghubungkan ke database...
+  </div>
+
+  <div id="students"></div>
+
+</main>
+
+<script>
+
+  // ==========================================
+  // SUPABASE
+  // ==========================================
+
+  const SUPABASE_URL = "https://ikzgoaixvpzntlmfctby.supabase.co";
+  const SUPABASE_ANON_KEY = "sb_publishable_qK9jSFBBmnjEtQDRam55sg_OpVGRVb7";
+
+  const supabaseClient =
+    window.supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_ANON_KEY
+    );
+
+
+  // ==========================================
+  // MEMUAT DATA SISWA
+  // ==========================================
+
+  async function loadStudents() {
+
+    const status = document.getElementById("status");
+    const studentsContainer =
+      document.getElementById("students");
+
+    status.textContent = "Mengambil data siswa...";
+
+    const { data, error } =
+      await supabaseClient
+        .from("siswa_game")
+        .select("*")
+        .order("nama");
+
+    if (error) {
+
+      console.error(error);
+
+      status.innerHTML =
+        '<span class="error">Gagal mengambil data: '
+        + error.message
+        + '</span>';
+
+      return;
+    }
+
+    status.textContent =
+      "Berhasil memuat " + data.length + " siswa.";
+
+    studentsContainer.innerHTML = "";
+
+    data.forEach(student => {
+
+      const card = document.createElement("div");
+
+      card.className = "student";
+
+      card.innerHTML = `
+        <h3>${student.nama}</h3>
+
+        <div>
+          ${student.kelas || ""}
+          ${student.regu ? " • Regu " + student.regu : ""}
+        </div>
+
+        <p class="exp">
+          ⚡ ${student.total_exp} EXP
+        </p>
+
+        <div>
+          Level ${student.level} —
+          ${student.gelar}
+        </div>
+
+        <div>
+          Badge: ${student.badge}
+        </div>
+      `;
+
+      studentsContainer.appendChild(card);
+
+    });
+
+  }
+
+
+  loadStudents();
+
+</script>
+
+</body>
+</html>
