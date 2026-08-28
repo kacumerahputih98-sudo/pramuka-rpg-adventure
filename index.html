@@ -82,7 +82,15 @@
     Menghubungkan ke database...
   </div>
 
-  <div id="students"></div>
+  <div class="search-box">
+  <input
+    type="text"
+    id="searchInput"
+    placeholder="🔎 Cari nama siswa..."
+  >
+</div>
+
+<div id="students"></div>
 
 </main>
 
@@ -169,10 +177,35 @@
 
     });
 
-  }
+    }
+
+
+  const searchInput = document.getElementById("searchInput");
+
+  searchInput.addEventListener("input", function () {
+
+    const keyword = searchInput.value.toLowerCase();
+
+    const cards = document.querySelectorAll(".student");
+
+    cards.forEach(card => {
+
+      const name = card.querySelector("h3").textContent.toLowerCase();
+
+      if (name.includes(keyword)) {
+        card.style.display = "";
+      } else {
+        card.style.display = "none";
+      }
+
+    });
+
+  });
 
 
   loadStudents();
+
+</script>
 
 </script>
 
