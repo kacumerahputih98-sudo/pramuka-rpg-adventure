@@ -108,6 +108,12 @@
   >
 </div>
 
+<div class="class-filter">
+  <select id="classFilter">
+    <option value="">📚 Semua Kelas</option>
+  </select>
+</div>
+
 <div id="students"></div>
 
 </main>
@@ -159,7 +165,29 @@
     }
 
     status.textContent =
-      "Berhasil memuat " + data.length + " siswa.";
+  "Berhasil memuat " + data.length + " siswa.";
+
+const classFilter = document.getElementById("classFilter");
+
+const classes = [
+  ...new Set(
+    data
+      .map(student => student.kelas)
+      .filter(kelas => kelas)
+  )
+].sort();
+
+classFilter.innerHTML =
+  '<option value="">📚 Semua Kelas</option>';
+
+classes.forEach(kelas => {
+  const option = document.createElement("option");
+
+  option.value = kelas;
+  option.textContent = "📚 " + kelas;
+
+  classFilter.appendChild(option);
+});
 
     studentsContainer.innerHTML = "";
 
@@ -167,9 +195,10 @@
 
       const card = document.createElement("div");
 
-      card.className = "student";
+card.className = "student";
+card.dataset.kelas = student.kelas || "";
 
-      card.innerHTML = `
+card.innerHTML = `
         <h3>${student.nama}</h3>
 
         <div>
@@ -199,29 +228,56 @@
 
 
   const searchInput = document.getElementById("searchInput");
+const classFilter = document.getElementById("classFilter");
 
-  searchInput.addEventListener("input", function () {
+function filterStudents() {
 
-    const keyword = searchInput.value.toLowerCase();
+  const keyword =
+    searchInput.value.toLowerCase();
 
-    const cards = document.querySelectorAll(".student");
+  const selectedClass =
+    classFilter.value;
 
-    cards.forEach(card => {
+  const cards =
+    document.querySelectorAll(".student");
 
-      const name = card.querySelector("h3").textContent.toLowerCase();
+  cards.forEach(card => {
 
-      if (name.includes(keyword)) {
-        card.style.display = "";
-      } else {
-        card.style.display = "none";
-      }
+    const name =
+      card.querySelector("h3")
+        .textContent
+        .toLowerCase();
 
-    });
+    const studentClass =
+      card.dataset.kelas || "";
+
+    const matchName =
+      name.includes(keyword);
+
+    const matchClass =
+      selectedClass === "" ||
+      studentClass === selectedClass;
+
+    if (matchName && matchClass) {
+      card.style.display = "";
+    } else {
+      card.style.display = "none";
+    }
 
   });
+}
 
+searchInput.addEventListener(
+  "input",
+  filterStudents
+);
 
-  loadStudents();
+classFilter.addEventListener(
+  "change",
+  filterStudents
+);
+
+loadStudents();
 
 </script>
 
