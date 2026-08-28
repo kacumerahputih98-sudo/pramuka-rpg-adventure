@@ -96,6 +96,29 @@
   border-color: #888;
 }
 
+    .password-box {
+  position: relative;
+  margin-bottom: 12px;
+}
+
+.password-box input {
+  margin-bottom: 0;
+  padding-right: 50px;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: auto !important;
+  padding: 6px 8px !important;
+  font-size: 18px !important;
+  background: transparent !important;
+  border: none !important;
+  cursor: pointer;
+}
+    
 .login-box button {
   width: 100%;
   padding: 14px 16px;
@@ -143,6 +166,17 @@
       background: white;
       cursor: pointer;
     }
+
+    .forgot-password {
+  width: 100%;
+  margin-top: 10px;
+  padding: 10px;
+  font-size: 14px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+    
   </style>
 </head>
 
@@ -164,17 +198,36 @@
     placeholder="Email Pembina"
   >
 
+  <div class="password-box">
   <input
     type="password"
     id="loginPassword"
     placeholder="Password"
   >
 
-  <button id="loginButton">
-    Masuk sebagai Pembina
+  <button
+    type="button"
+    id="togglePassword"
+    class="password-toggle"
+    title="Tampilkan password"
+  >
+    👁️
   </button>
+</div>
 
-  <p id="loginMessage"></p>
+  <button id="loginButton">
+  Masuk sebagai Pembina
+</button>
+
+<button
+  type="button"
+  id="forgotPasswordButton"
+  class="forgot-password"
+>
+  🔑 Lupa Password?
+</button>
+
+<p id="loginMessage"></p>
 </div>
   
   <div class="status" id="status">
@@ -222,7 +275,60 @@ const loginButton = document.getElementById("loginButton");
 const loginEmail = document.getElementById("loginEmail");
 const loginPassword = document.getElementById("loginPassword");
 const loginMessage = document.getElementById("loginMessage");
+const togglePassword =
+  document.getElementById("togglePassword");
 
+togglePassword.addEventListener("click", () => {
+
+  if (loginPassword.type === "password") {
+    loginPassword.type = "text";
+    togglePassword.textContent = "🙈";
+    togglePassword.title = "Sembunyikan password";
+  } else {
+    loginPassword.type = "password";
+    togglePassword.textContent = "👁️";
+    togglePassword.title = "Tampilkan password";
+  }
+
+});
+
+const forgotPasswordButton =
+  document.getElementById("forgotPasswordButton");
+
+forgotPasswordButton.addEventListener("click", async () => {
+
+  const email = loginEmail.value.trim();
+
+  if (!email) {
+    loginMessage.textContent =
+      "Masukkan email terlebih dahulu.";
+    loginEmail.focus();
+    return;
+  }
+
+  loginMessage.textContent =
+    "Mengirim link reset password...";
+
+  const { error } =
+    await supabaseClient.auth.resetPasswordForEmail(
+      email,
+      {
+        redirectTo: window.location.origin
+      }
+    );
+
+  if (error) {
+    console.error(error);
+
+    loginMessage.textContent =
+      "❌ Gagal mengirim link reset password.";
+    return;
+  }
+
+  loginMessage.textContent =
+    "✅ Link reset password sudah dikirim ke email tersebut. Silakan cek inbox atau folder spam.";
+});
+  
 loginButton.addEventListener("click", async () => {
 
   const email = loginEmail.value.trim();
@@ -243,13 +349,18 @@ loginButton.addEventListener("click", async () => {
     });
 
   if (error) {
-    console.error(error);
+  console.error(error);
 
+  if (error.message.toLowerCase().includes("invalid login credentials")) {
     loginMessage.textContent =
-      "Login gagal: " + error.message;
-
-    return;
+      "❌ Email atau password yang dimasukkan salah.";
+  } else {
+    loginMessage.textContent =
+      "❌ Login gagal. Silakan coba lagi.";
   }
+
+  return;
+}
 
   loginMessage.textContent =
     "Login berhasil. Selamat datang Pembina!";
@@ -402,8 +513,6 @@ classFilter.addEventListener(
 );
 
 loadStudents();
-
-</script>
 
 </script>
 
