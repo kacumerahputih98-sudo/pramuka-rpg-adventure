@@ -67,6 +67,50 @@
       color: #b00020;
     }
 
+    .login-box {
+  background: white;
+  padding: 20px;
+  margin-bottom: 20px;
+  border-radius: 12px;
+  border: 1px solid #ddd;
+}
+
+.login-box h2 {
+  margin-top: 0;
+  margin-bottom: 15px;
+}
+
+.login-box input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 14px 16px;
+  margin-bottom: 12px;
+  font-size: 16px;
+  border: 2px solid #ddd;
+  border-radius: 12px;
+  background: white;
+}
+
+.login-box input:focus {
+  outline: none;
+  border-color: #888;
+}
+
+.login-box button {
+  width: 100%;
+  padding: 14px 16px;
+  font-size: 16px;
+  font-weight: bold;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+#loginMessage {
+  margin-bottom: 0;
+  font-size: 14px;
+}
+    
         .search-box {
       margin-bottom: 20px;
     }
@@ -111,6 +155,28 @@
 
 <main>
 
+  <div class="login-box" id="loginBox">
+  <h2>🔐 Login Pembina</h2>
+
+  <input
+    type="email"
+    id="loginEmail"
+    placeholder="Email Pembina"
+  >
+
+  <input
+    type="password"
+    id="loginPassword"
+    placeholder="Password"
+  >
+
+  <button id="loginButton">
+    Masuk sebagai Pembina
+  </button>
+
+  <p id="loginMessage"></p>
+</div>
+  
   <div class="status" id="status">
     Menghubungkan ke database...
   </div>
@@ -148,6 +214,49 @@
       SUPABASE_ANON_KEY
     );
 
+  // ==========================================
+// LOGIN PEMBINA
+// ==========================================
+
+const loginButton = document.getElementById("loginButton");
+const loginEmail = document.getElementById("loginEmail");
+const loginPassword = document.getElementById("loginPassword");
+const loginMessage = document.getElementById("loginMessage");
+
+loginButton.addEventListener("click", async () => {
+
+  const email = loginEmail.value.trim();
+  const password = loginPassword.value;
+
+  if (!email || !password) {
+    loginMessage.textContent =
+      "Email dan password wajib diisi.";
+    return;
+  }
+
+  loginMessage.textContent = "Memproses login...";
+
+  const { data, error } =
+    await supabaseClient.auth.signInWithPassword({
+      email: email,
+      password: password
+    });
+
+  if (error) {
+    console.error(error);
+
+    loginMessage.textContent =
+      "Login gagal: " + error.message;
+
+    return;
+  }
+
+  loginMessage.textContent =
+    "Login berhasil. Selamat datang Pembina!";
+
+  console.log("User login:", data.user);
+
+});
 
   // ==========================================
   // MEMUAT DATA SISWA
