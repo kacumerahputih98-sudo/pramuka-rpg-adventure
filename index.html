@@ -313,7 +313,7 @@ forgotPasswordButton.addEventListener("click", async () => {
     await supabaseClient.auth.resetPasswordForEmail(
       email,
       {
-        redirectTo: window.location.origin
+        redirectTo: window.location.origin + "/pramuka-rpg-adventure/"
       }
     );
 
