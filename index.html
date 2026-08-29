@@ -486,12 +486,12 @@ forgotPasswordButton.addEventListener("click", async () => {
     );
 
   if (error) {
-    console.error(error);
+  console.error(error);
 
-    loginMessage.textContent =
-      "❌ Gagal mengirim link reset password.";
-    return;
-  }
+  loginMessage.textContent =
+    "❌ Gagal: " + error.message;
+  return;
+}
 
   loginMessage.textContent =
     "✅ Link reset password sudah dikirim ke email tersebut. Silakan cek inbox atau folder spam.";
