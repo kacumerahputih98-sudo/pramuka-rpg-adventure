@@ -342,6 +342,44 @@
     
 </div>
 
+
+  <div class="exp-panel" id="expPanel" style="display: none;">
+
+  <h2>⚡ Kelola EXP</h2>
+
+  <p id="expStudentName"></p>
+
+    <label for="expAmount">Jumlah EXP</label>
+
+<input
+  type="number"
+  id="expAmount"
+  min="1"
+  placeholder="Contoh: 10"
+>
+
+
+<label for="expReason">Alasan</label>
+
+<input
+  type="text"
+  id="expReason"
+  placeholder="Contoh: Menyelesaikan misi"
+>
+    
+  <button id="addExpButton">
+    ➕ Tambah EXP
+  </button>
+
+  <button id="removeExpButton">
+    ➖ Kurangi EXP
+  </button>
+
+  <button id="closeExpPanel">
+    Tutup
+  </button>
+
+</div>
   
   <div class="status" id="status">
     Menghubungkan ke database...
@@ -407,7 +445,106 @@ const updatePasswordButton =
 const resetMessage =
   document.getElementById("resetMessage");
 
+  const expPanel =
+  document.getElementById("expPanel");
 
+const expStudentName =
+  document.getElementById("expStudentName");
+
+const closeExpPanel =
+  document.getElementById("closeExpPanel");
+
+const addExpButton =
+  document.getElementById("addExpButton");
+
+const removeExpButton =
+  document.getElementById("removeExpButton");
+  
+  let selectedStudentId = null;
+
+  const expAmount =
+  document.getElementById("expAmount");
+
+const expReason =
+  document.getElementById("expReason");
+
+async function saveExpTransaction(jenis) {
+
+  if (!selectedStudentId) {
+    alert("Silakan pilih siswa terlebih dahulu.");
+    return;
+  }
+
+  const jumlahExp =
+    parseInt(expAmount.value, 10);
+
+  const alasan =
+    expReason.value.trim();
+
+  if (!jumlahExp || jumlahExp <= 0) {
+    alert("Jumlah EXP harus lebih dari 0.");
+    return;
+  }
+
+  if (!alasan) {
+    alert("Alasan wajib diisi.");
+    expReason.focus();
+    return;
+  }
+
+  const {
+    data: { session }
+  } = await supabaseClient.auth.getSession();
+
+  if (!session) {
+    alert("❌ Silakan login sebagai Pembina terlebih dahulu.");
+    return;
+  }
+
+  const { error } =
+    await supabaseClient
+      .from("exp_logs")
+      .insert({
+        id_siswa: selectedStudentId,
+        jenis: jenis,
+        alasan: alasan,
+        jumlah_exp: jumlahExp
+      });
+
+  if (error) {
+
+    console.error(error);
+
+    alert(
+      "❌ Gagal menyimpan transaksi EXP: " +
+      error.message
+    );
+
+    return;
+  }
+
+  alert(
+    jenis === "+"
+      ? "✅ EXP berhasil ditambahkan."
+      : "✅ EXP berhasil dikurangi."
+  );
+
+  expAmount.value = "";
+  expReason.value = "";
+
+  expPanel.style.display = "none";
+
+  await loadStudents();
+}
+
+  addExpButton.addEventListener("click", () => {
+  saveExpTransaction("+");
+});
+
+removeExpButton.addEventListener("click", () => {
+  saveExpTransaction("-");
+});
+  
 // ==========================================
 // PASSWORD RECOVERY
 // ==========================================
@@ -712,13 +849,60 @@ card.innerHTML = `
         <div>
           Badge: ${student.badge}
         </div>
+        
+       <button
+         class="manage-exp-button"
+         data-id="${student.id_siswa}"
+>
+  ⚡ Kelola EXP
+</button>
       `;
 
       studentsContainer.appendChild(card);
 
     });
 
-    }
+    checkPembinaAccess();
+
+document
+  .querySelectorAll(".manage-exp-button")
+  .forEach(button => {
+
+    button.addEventListener("click", () => {
+
+      const studentId =
+        button.dataset.id;
+
+      selectedStudentId = studentId;
+      
+      const student =
+        data.find(
+          item => item.id_siswa === studentId
+        );
+
+      if (!student) {
+        return;
+      }
+
+      expStudentName.textContent =
+        student.nama +
+        " • " +
+        (student.kelas || "") +
+        " • EXP saat ini: " +
+        student.total_exp;
+
+      expPanel.style.display = "block";
+
+      expPanel.scrollIntoView({
+        behavior: "smooth",
+        block: "center"
+      });
+
+    });
+
+  });
+
+}
 
 
   const searchInput = document.getElementById("searchInput");
@@ -773,6 +957,34 @@ classFilter.addEventListener(
 
 loadStudents();
 
+  closeExpPanel.addEventListener("click", () => {
+
+  expPanel.style.display = "none";
+
+});
+  
+  // ==========================================
+// CEK AKSES PEMBINA
+// ==========================================
+
+async function checkPembinaAccess() {
+
+  const {
+    data: { session }
+  } = await supabaseClient.auth.getSession();
+
+  const isPembina = !!session;
+
+  document
+    .querySelectorAll(".manage-exp-button")
+    .forEach(button => {
+
+      button.style.display =
+        isPembina ? "block" : "none";
+
+    });
+}
+  
 </script>
 
 </body>
