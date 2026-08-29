@@ -275,6 +275,8 @@
   </button>
 </div>
 
+</div>
+    
 <div class="reset-box" id="resetBox" style="display: none;">
 
   <h2>🔐 Buat Password Baru</h2>
@@ -406,34 +408,39 @@ const resetMessage =
 
 
 // ==========================================
-// CEK MODE RESET PASSWORD
+// PASSWORD RECOVERY
 // ==========================================
 
-const urlHash = window.location.hash;
-
-if (urlHash.includes("type=recovery")) {
+function showResetPasswordForm() {
 
   loginBox.style.display = "none";
-
   resetBox.style.display = "block";
 
 }
 
 
-// ==========================================
-// PASSWORD RECOVERY
-// ==========================================
-
+// Deteksi saat Supabase berhasil membuat
+// session recovery dari link email
 supabaseClient.auth.onAuthStateChange((event, session) => {
+
+  console.log("Auth event:", event);
 
   if (event === "PASSWORD_RECOVERY") {
 
-    loginBox.style.display = "none";
-    resetBox.style.display = "block";
+    showResetPasswordForm();
 
   }
 
 });
+
+
+// Deteksi link recovery yang sedang dibuka
+if (window.location.hash.includes("type=recovery")) {
+
+  showResetPasswordForm();
+
+}
+
   
 const togglePassword =
   document.getElementById("togglePassword");
