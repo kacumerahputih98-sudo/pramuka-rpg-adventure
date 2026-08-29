@@ -75,6 +75,66 @@
   border: 1px solid #ddd;
 }
 
+.reset-box {
+  background: white;
+  padding: 20px;
+  margin-bottom: 20px;
+  border-radius: 12px;
+  border: 1px solid #ddd;
+}
+
+.reset-box h2 {
+  margin-top: 0;
+  margin-bottom: 10px;
+}
+
+.reset-box p {
+  color: #666;
+  line-height: 1.5;
+}
+
+.reset-box input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 14px 16px;
+  margin-bottom: 12px;
+  font-size: 16px;
+  border: 2px solid #ddd;
+  border-radius: 12px;
+  background: white;
+}
+
+.reset-box input:focus {
+  outline: none;
+  border-color: #888;
+}
+
+.reset-box button {
+  width: 100%;
+  padding: 14px 16px;
+  font-size: 16px;
+  font-weight: bold;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+.reset-box .password-box {
+  margin-bottom: 12px;
+}
+
+.reset-box .password-box input {
+  margin-bottom: 0;
+}
+
+.reset-box .password-toggle {
+  width: auto !important;
+  padding: 6px 8px !important;
+  font-size: 18px !important;
+  background: transparent !important;
+  border: none !important;
+}
+    
 .login-box h2 {
   margin-top: 0;
   margin-bottom: 15px;
@@ -215,6 +275,56 @@
   </button>
 </div>
 
+<div class="reset-box" id="resetBox" style="display: none;">
+
+  <h2>🔐 Buat Password Baru</h2>
+
+  <p>
+    Silakan buat password baru untuk akun Pembina kamu.
+  </p>
+
+  <div class="password-box">
+    <input
+      type="password"
+      id="newPassword"
+      placeholder="Password Baru"
+    >
+
+    <button
+      type="button"
+      id="toggleNewPassword"
+      class="password-toggle"
+      title="Tampilkan password"
+    >
+      👁️
+    </button>
+  </div>
+
+  <div class="password-box">
+    <input
+      type="password"
+      id="confirmPassword"
+      placeholder="Konfirmasi Password Baru"
+    >
+
+    <button
+      type="button"
+      id="toggleConfirmPassword"
+      class="password-toggle"
+      title="Tampilkan password"
+    >
+      👁️
+    </button>
+  </div>
+
+  <button id="updatePasswordButton">
+    Simpan Password Baru
+  </button>
+
+  <p id="resetMessage"></p>
+
+</div>
+    
   <button id="loginButton">
   Masuk sebagai Pembina
 </button>
@@ -275,6 +385,56 @@ const loginButton = document.getElementById("loginButton");
 const loginEmail = document.getElementById("loginEmail");
 const loginPassword = document.getElementById("loginPassword");
 const loginMessage = document.getElementById("loginMessage");
+
+const loginBox =
+  document.getElementById("loginBox");
+
+const resetBox =
+  document.getElementById("resetBox");
+
+const newPassword =
+  document.getElementById("newPassword");
+
+const confirmPassword =
+  document.getElementById("confirmPassword");
+
+const updatePasswordButton =
+  document.getElementById("updatePasswordButton");
+
+const resetMessage =
+  document.getElementById("resetMessage");
+
+
+// ==========================================
+// CEK MODE RESET PASSWORD
+// ==========================================
+
+const urlHash = window.location.hash;
+
+if (urlHash.includes("type=recovery")) {
+
+  loginBox.style.display = "none";
+
+  resetBox.style.display = "block";
+
+}
+
+
+// ==========================================
+// PASSWORD RECOVERY
+// ==========================================
+
+supabaseClient.auth.onAuthStateChange((event, session) => {
+
+  if (event === "PASSWORD_RECOVERY") {
+
+    loginBox.style.display = "none";
+    resetBox.style.display = "block";
+
+  }
+
+});
+  
 const togglePassword =
   document.getElementById("togglePassword");
 
@@ -327,6 +487,97 @@ forgotPasswordButton.addEventListener("click", async () => {
 
   loginMessage.textContent =
     "✅ Link reset password sudah dikirim ke email tersebut. Silakan cek inbox atau folder spam.";
+});
+
+// ==========================================
+// UPDATE PASSWORD BARU
+// ==========================================
+
+updatePasswordButton.addEventListener("click", async () => {
+
+  const password = newPassword.value;
+  const confirm = confirmPassword.value;
+
+  if (!password || !confirm) {
+    resetMessage.textContent =
+      "Password baru dan konfirmasi password wajib diisi.";
+    return;
+  }
+
+  if (password.length < 6) {
+    resetMessage.textContent =
+      "Password minimal 6 karakter.";
+    return;
+  }
+
+  if (password !== confirm) {
+    resetMessage.textContent =
+      "❌ Konfirmasi password tidak sama.";
+    return;
+  }
+
+  resetMessage.textContent =
+    "Menyimpan password baru...";
+
+  const { error } =
+    await supabaseClient.auth.updateUser({
+      password: password
+    });
+
+  if (error) {
+    console.error(error);
+
+    resetMessage.textContent =
+      "❌ Gagal mengubah password. Silakan coba lagi.";
+
+    return;
+  }
+
+  resetMessage.textContent =
+    "✅ Password berhasil diubah. Silakan login kembali.";
+
+  newPassword.value = "";
+  confirmPassword.value = "";
+
+});
+
+  // ==========================================
+// TAMPILKAN / SEMBUNYIKAN PASSWORD BARU
+// ==========================================
+
+const toggleNewPassword =
+  document.getElementById("toggleNewPassword");
+
+toggleNewPassword.addEventListener("click", () => {
+
+  if (newPassword.type === "password") {
+    newPassword.type = "text";
+    toggleNewPassword.textContent = "🙈";
+    toggleNewPassword.title = "Sembunyikan password";
+  } else {
+    newPassword.type = "password";
+    toggleNewPassword.textContent = "👁️";
+    toggleNewPassword.title = "Tampilkan password";
+  }
+
+});
+
+
+const toggleConfirmPassword =
+  document.getElementById("toggleConfirmPassword");
+
+toggleConfirmPassword.addEventListener("click", () => {
+
+  if (confirmPassword.type === "password") {
+    confirmPassword.type = "text";
+    toggleConfirmPassword.textContent = "🙈";
+    toggleConfirmPassword.title = "Sembunyikan password";
+  } else {
+    confirmPassword.type = "password";
+    toggleConfirmPassword.textContent = "👁️";
+    toggleConfirmPassword.title = "Tampilkan password";
+  }
+
 });
   
 loginButton.addEventListener("click", async () => {
