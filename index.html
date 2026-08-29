@@ -761,6 +761,8 @@ loginButton.addEventListener("click", async () => {
   loginMessage.textContent =
     "Login berhasil. Selamat datang Pembina!";
 
+  await loadStudents();
+  
   console.log("User login:", data.user);
 
 });
