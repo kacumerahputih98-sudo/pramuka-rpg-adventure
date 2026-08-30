@@ -350,6 +350,7 @@
 .profile-progress-fill {
   height: 100%;
   width: 0%;
+  background: #287be8;
   border-radius: 20px;
   transition: width 0.5s ease;
 }
@@ -1422,20 +1423,14 @@ if (totalExp >= 3000) {
 
 }
 
-const progressRange =
-  nextLevelExp - currentLevelExp;
-
-const progressAmount =
-  totalExp - currentLevelExp;
-
 const progressPercent =
-  progressRange === 0
+  nextLevelExp === 0
     ? 100
     : Math.min(
         100,
         Math.max(
           0,
-          (progressAmount / progressRange) * 100
+          (totalExp / nextLevelExp) * 100
         )
       );
 
