@@ -442,6 +442,38 @@
   </button>
 
 </div>
+
+  <div class="profile-panel" id="profilePanel" style="display: none;">
+
+  <h2>👤 Profil Siswa</h2>
+
+  <h3 id="profileStudentName"></h3>
+
+  <p id="profileStudentId"></p>
+  <p id="profileStudentClass"></p>
+  <p id="profileStudentTeam"></p>
+
+  <div class="profile-exp">
+    ⚡ <span id="profileTotalExp"></span> EXP
+  </div>
+
+  <p>
+    🏅 Level <span id="profileLevel"></span>
+  </p>
+
+  <p>
+    🎖️ Gelar: <span id="profileGelar"></span>
+  </p>
+
+  <p>
+    🏆 Badge: <span id="profileBadge"></span>
+  </p>
+
+  <button id="closeProfilePanel">
+    Tutup
+  </button>
+
+</div>
   
   <div class="status" id="status">
     Menghubungkan ke database...
@@ -513,6 +545,42 @@ const resetMessage =
   const historyPanel =
   document.getElementById("historyPanel");
 
+  const profilePanel =
+  document.getElementById("profilePanel");
+
+const profileStudentName =
+  document.getElementById("profileStudentName");
+
+const profileStudentId =
+  document.getElementById("profileStudentId");
+
+const profileStudentClass =
+  document.getElementById("profileStudentClass");
+
+const profileStudentTeam =
+  document.getElementById("profileStudentTeam");
+
+const profileTotalExp =
+  document.getElementById("profileTotalExp");
+
+const profileLevel =
+  document.getElementById("profileLevel");
+
+const profileGelar =
+  document.getElementById("profileGelar");
+
+const profileBadge =
+  document.getElementById("profileBadge");
+
+const closeProfilePanel =
+  document.getElementById("closeProfilePanel");
+
+  closeProfilePanel.addEventListener("click", () => {
+
+  profilePanel.style.display = "none";
+
+});
+  
 const historyStudentName =
   document.getElementById("historyStudentName");
 
@@ -945,6 +1013,13 @@ card.innerHTML = `
 >
   📜 Riwayat EXP
 </button>
+
+<button
+  class="profile-student-button"
+  data-id="${student.id_siswa}"
+>
+  👤 Lihat Profil
+</button>
       `;
 
       studentsContainer.appendChild(card);
@@ -1025,7 +1100,7 @@ document
         behavior: "smooth",
         block: "center"
       });
-
+      
       const { data: logs, error } =
         await supabaseClient
           .from("exp_logs")
@@ -1154,6 +1229,62 @@ if (session) {
 
 }
       
+    });
+
+  });
+
+    document
+  .querySelectorAll(".profile-student-button")
+  .forEach(button => {
+
+    button.addEventListener("click", () => {
+
+      const studentId =
+        button.dataset.id;
+
+      const student =
+        data.find(
+          item => item.id_siswa === studentId
+        );
+
+      if (!student) {
+        return;
+      }
+
+      profileStudentName.textContent =
+        student.nama;
+
+      profileStudentId.textContent =
+        "🆔 ID Siswa: " +
+        student.id_siswa;
+
+      profileStudentClass.textContent =
+        "📚 Kelas: " +
+        (student.kelas || "-");
+
+      profileStudentTeam.textContent =
+        "🏕️ Regu: " +
+        (student.regu || "-");
+
+      profileTotalExp.textContent =
+        student.total_exp;
+
+      profileLevel.textContent =
+        student.level;
+
+      profileGelar.textContent =
+        student.gelar;
+
+      profileBadge.textContent =
+        student.badge;
+
+      profilePanel.style.display = "block";
+
+      profilePanel.scrollIntoView({
+        behavior: "smooth",
+        block: "center"
+      });
+
     });
 
   });
