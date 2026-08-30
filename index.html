@@ -1061,22 +1061,99 @@ document
               ? "➕"
               : "➖";
 
-          return `
-            <div class="history-item">
-              <strong>
-                ${tanda} ${log.jumlah_exp} EXP
-              </strong>
-              <div>
-                ${log.alasan}
-              </div>
-              <small>
-                ${new Date(log.created_at).toLocaleString("id-ID")}
-              </small>
-            </div>
-          `;
+         return `
+  <div class="history-item">
+
+    <div class="history-content">
+
+      <strong>
+        ${tanda} ${log.jumlah_exp} EXP
+      </strong>
+
+      <div>
+        ${log.alasan}
+      </div>
+
+      <small>
+        ${new Date(log.created_at).toLocaleString("id-ID")}
+      </small>
+
+    </div>
+
+    <button
+      class="delete-history-button"
+      data-log-id="${log.id}"
+      title="Hapus transaksi"
+      style="display: none;"
+    >
+      🗑️
+    </button>
+
+  </div>
+`;
 
         }).join("");
 
+      // Tampilkan tombol hapus hanya untuk Pembina
+const {
+  data: { session }
+} = await supabaseClient.auth.getSession();
+
+if (session) {
+
+  document
+    .querySelectorAll(".delete-history-button")
+    .forEach(button => {
+
+      button.style.display = "block";
+
+      button.addEventListener("click", async () => {
+
+        const logId =
+          button.dataset.logId;
+
+        const yakin =
+          confirm(
+            "⚠️ Hapus transaksi EXP ini?\n\n" +
+            "Transaksi yang dihapus akan memengaruhi total EXP siswa."
+          );
+
+        if (!yakin) {
+          return;
+        }
+
+        const { error } =
+          await supabaseClient
+            .from("exp_logs")
+            .delete()
+            .eq("id", logId);
+
+        if (error) {
+
+          console.error(error);
+
+          alert(
+            "❌ Gagal menghapus transaksi: " +
+            error.message
+          );
+
+          return;
+        }
+
+        alert("✅ Transaksi EXP berhasil dihapus.");
+
+        // Muat ulang data siswa agar total EXP ikut berubah
+        await loadStudents();
+
+        // Tutup panel riwayat
+        historyPanel.style.display = "none";
+
+      });
+
+    });
+
+}
+      
     });
 
   });
