@@ -853,10 +853,17 @@ card.innerHTML = `
         </div>
         
        <button
-         class="manage-exp-button"
-         data-id="${student.id_siswa}"
+  class="manage-exp-button"
+  data-id="${student.id_siswa}"
 >
   ⚡ Kelola EXP
+</button>
+
+<button
+  class="history-exp-button"
+  data-id="${student.id_siswa}"
+>
+  📜 Riwayat EXP
 </button>
       `;
 
@@ -904,6 +911,68 @@ document
 
   });
 
+    document
+  .querySelectorAll(".history-exp-button")
+  .forEach(button => {
+
+    button.addEventListener("click", async () => {
+
+      const studentId =
+        button.dataset.id;
+
+      const { data, error } =
+        await supabaseClient
+          .from("exp_logs")
+          .select("*")
+          .eq("id_siswa", studentId)
+          .order("created_at", {
+            ascending: false
+          });
+
+      if (error) {
+
+        console.error(error);
+
+        alert(
+          "❌ Gagal mengambil riwayat EXP: " +
+          error.message
+        );
+
+        return;
+      }
+
+      if (!data || data.length === 0) {
+
+        alert("Belum ada riwayat EXP untuk siswa ini.");
+
+        return;
+      }
+
+      const history =
+        data.map(log => {
+
+          const tanda =
+            log.jenis === "+" ? "➕" : "➖";
+
+          return (
+            tanda +
+            " " +
+            log.jumlah_exp +
+            " EXP — " +
+            log.alasan
+          );
+
+        }).join("\n");
+
+      alert(
+        "📜 RIWAYAT EXP\n\n" +
+        history
+      );
+
+    });
+
+  });
+    
 }
 
 
