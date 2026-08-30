@@ -327,6 +327,39 @@
   border: 4px solid #ddd;
   background: #f5f1e8;
 }
+
+    .profile-progress {
+  margin: 20px 0;
+}
+
+.profile-progress-label {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-weight: bold;
+}
+
+.profile-progress-bar {
+  width: 100%;
+  height: 18px;
+  background: #e5e5e5;
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.profile-progress-fill {
+  height: 100%;
+  width: 0%;
+  border-radius: 20px;
+  transition: width 0.5s ease;
+}
+
+#profileNextLevel {
+  margin: 8px 0 0;
+  text-align: center;
+  color: #666;
+  font-size: 14px;
+}
     
   </style>
 </head>
@@ -521,6 +554,22 @@
     🏆 Badge: <span id="profileBadge"></span>
   </p>
 
+    <div class="profile-progress">
+  <div class="profile-progress-label">
+    <span>Progress Level</span>
+    <span id="profileProgressText"></span>
+  </div>
+
+  <div class="profile-progress-bar">
+    <div
+      id="profileProgressFill"
+      class="profile-progress-fill"
+    ></div>
+  </div>
+
+  <p id="profileNextLevel"></p>
+</div>
+    
   <button id="closeProfilePanel">
     Tutup
   </button>
@@ -605,6 +654,15 @@ const profileStudentName =
 
   const profileAvatar =
   document.getElementById("profileAvatar");
+
+  const profileProgressText =
+  document.getElementById("profileProgressText");
+
+const profileProgressFill =
+  document.getElementById("profileProgressFill");
+
+const profileNextLevel =
+  document.getElementById("profileNextLevel");
   
 const profileStudentId =
   document.getElementById("profileStudentId");
@@ -1329,10 +1387,82 @@ if (session) {
         (student.regu || "-");
 
       profileTotalExp.textContent =
-        student.total_exp;
+  student.total_exp;
 
-      profileLevel.textContent =
-        student.level;
+const totalExp =
+  Number(student.total_exp) || 0;
+
+let currentLevelExp = 100;
+let nextLevelExp = 500;
+let nextLevelName = "Penjelajah 🏕️";
+
+if (totalExp >= 3000) {
+
+  currentLevelExp = 3000;
+  nextLevelExp = 3000;
+  nextLevelName = "Level Maksimal 👑";
+
+} else if (totalExp >= 1000) {
+
+  currentLevelExp = 1000;
+  nextLevelExp = 3000;
+  nextLevelName = "Legenda 👑";
+
+} else if (totalExp >= 500) {
+
+  currentLevelExp = 500;
+  nextLevelExp = 1000;
+  nextLevelName = "Pendaki 🧭";
+
+} else {
+
+  currentLevelExp = 100;
+  nextLevelExp = 500;
+  nextLevelName = "Penjelajah 🏕️";
+
+}
+
+const progressRange =
+  nextLevelExp - currentLevelExp;
+
+const progressAmount =
+  totalExp - currentLevelExp;
+
+const progressPercent =
+  progressRange === 0
+    ? 100
+    : Math.min(
+        100,
+        Math.max(
+          0,
+          (progressAmount / progressRange) * 100
+        )
+      );
+
+profileProgressText.textContent =
+  totalExp + " / " + nextLevelExp + " EXP";
+
+profileProgressFill.style.width =
+  progressPercent + "%";
+
+if (totalExp >= 3000) {
+
+  profileNextLevel.textContent =
+    "🏆 Kamu sudah mencapai level maksimal!";
+
+} else {
+
+  const remainingExp =
+    nextLevelExp - totalExp;
+
+  profileNextLevel.textContent =
+    remainingExp +
+    " EXP lagi menuju " +
+    nextLevelName;
+}
+
+profileLevel.textContent =
+  student.level;
 
       profileGelar.textContent =
         student.gelar;
