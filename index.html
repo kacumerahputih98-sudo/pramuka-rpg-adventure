@@ -745,16 +745,58 @@
   </select>
 </div>
 
-<div class="leaderboard-panel" id="leaderboardPanel">
+  <button id="openLeaderboardButton">
+  🏆 Leaderboard Siswa
+</button>
+  
+  <div id="homePage">
+    
+<div
+  class="leaderboard-panel"
+  id="leaderboardPanel"
+  style="display: none;"
+>
 
   <h2>🏆 Leaderboard Siswa</h2>
 
   <div id="leaderboardList"></div>
 
+  <button id="closeLeaderboardButton">
+  ← Kembali ke Daftar Siswa
+</button>
+  
 </div>
   
-<div id="students"></div>
+<div id="students" style="display: none;"></div>
 
+    </div>
+
+<div
+  id="leaderboardPage"
+  style="display: none;"
+>
+
+  <button
+    id="backFromLeaderboard"
+    class="back-button"
+  >
+    ← Kembali
+  </button>
+
+  <div class="leaderboard-panel">
+
+    <h2>🏆 Leaderboard Siswa</h2>
+
+    <p class="page-description">
+      Peringkat siswa berdasarkan total EXP.
+    </p>
+
+    <div id="leaderboardPageList"></div>
+
+  </div>
+
+</div>
+    
 </main>
 
 <script>
@@ -1819,6 +1861,32 @@ profileLevel.textContent =
   const searchInput = document.getElementById("searchInput");
 const classFilter = document.getElementById("classFilter");
 
+  const openLeaderboardButton =
+  document.getElementById("openLeaderboardButton");
+
+const leaderboardPanel =
+  document.getElementById("leaderboardPanel");
+
+openLeaderboardButton.addEventListener("click", () => {
+
+  leaderboardPanel.style.display = "block";
+
+  leaderboardPanel.scrollIntoView({
+    behavior: "smooth",
+    block: "start"
+  });
+
+});
+
+  const closeLeaderboardButton =
+  document.getElementById("closeLeaderboardButton");
+
+closeLeaderboardButton.addEventListener("click", () => {
+
+  leaderboardPanel.style.display = "none";
+
+});
+  
 function filterStudents() {
 
   const keyword =
@@ -1827,6 +1895,13 @@ function filterStudents() {
   const selectedClass =
   classFilter.value;
 
+  if (selectedClass === "") {
+  document.getElementById("students").style.display = "none";
+  return;
+}
+
+document.getElementById("students").style.display = "block";
+  
   const cards =
     document.querySelectorAll(".student");
 
