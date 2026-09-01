@@ -355,6 +355,48 @@
   transition: width 0.5s ease;
 }
 
+.leaderboard-panel {
+  background: white;
+  padding: 20px;
+  margin-bottom: 20px;
+  border-radius: 12px;
+  border: 1px solid #ddd;
+}
+
+.leaderboard-panel h2 {
+  margin-top: 0;
+  margin-bottom: 15px;
+}
+
+.leaderboard-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.leaderboard-rank {
+  width: 38px;
+  font-weight: bold;
+  font-size: 18px;
+  text-align: center;
+}
+
+.leaderboard-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.leaderboard-info strong {
+  display: block;
+}
+
+.leaderboard-meta {
+  font-size: 14px;
+  color: #666;
+}
+    
 #profileNextLevel {
   margin: 8px 0 0;
   text-align: center;
@@ -1084,6 +1126,42 @@ classes.forEach(kelas => {
   classFilter.appendChild(option);
 });
 
+const leaderboardList =
+  document.getElementById("leaderboardList");
+
+leaderboardList.innerHTML = "";
+
+leaderboardData.forEach((student, index) => {
+
+  const row = document.createElement("div");
+  row.className = "leaderboard-item";
+
+  let rank = (index + 1) + ".";
+
+  if (index === 0) rank = "🥇";
+  if (index === 1) rank = "🥈";
+  if (index === 2) rank = "🥉";
+
+  row.innerHTML = `
+    <div class="leaderboard-rank">
+      ${rank}
+    </div>
+
+    <div class="leaderboard-info">
+      <strong>${student.nama}</strong>
+
+      <div class="leaderboard-meta">
+        ${student.kelas || "-"} •
+        ⚡ ${student.total_exp} EXP •
+        ${student.badge}
+      </div>
+    </div>
+  `;
+
+  leaderboardList.appendChild(row);
+
+});
+    
     studentsContainer.innerHTML = "";
 
     data.forEach(student => {
