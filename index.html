@@ -1895,12 +1895,12 @@ function filterStudents() {
   const selectedClass =
   classFilter.value;
 
-  if (selectedClass === "") {
-  document.getElementById("students").style.display = "none";
-  return;
-}
+    if (selectedClass === "" && keyword === "") {
+    document.getElementById("students").style.display = "none";
+    return;
+  }
 
-document.getElementById("students").style.display = "block";
+  document.getElementById("students").style.display = "block";
   
   const cards =
     document.querySelectorAll(".student");
