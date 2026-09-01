@@ -1834,7 +1834,7 @@ function filterStudents() {
     searchInput.value.toLowerCase();
 
   const selectedClass =
-    classFilter.value;
+  classFilter.value.trim().toLowerCase();
 
   const cards =
     document.querySelectorAll(".student");
@@ -1847,7 +1847,7 @@ function filterStudents() {
         .toLowerCase();
 
     const studentClass =
-      card.dataset.kelas || "";
+  (card.dataset.kelas || "").trim().toLowerCase();
 
     const matchName =
       name.includes(keyword);
