@@ -47,12 +47,34 @@
     }
 
     .student {
-      background: white;
-      padding: 18px;
-      margin-bottom: 12px;
-      border-radius: 12px;
-      border: 1px solid #ddd;
-    }
+  background: white;
+  padding: 20px;
+  margin-bottom: 14px;
+  border-radius: 16px;
+  border: 1px solid #ddd;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+}
+
+.student h3 {
+  margin: 0 0 8px;
+  font-size: 20px;
+}
+
+.student .exp {
+  margin: 12px 0;
+  font-size: 19px;
+}
+
+.student button {
+  width: 100%;
+  padding: 12px 14px;
+  margin-top: 8px;
+  font-size: 15px;
+  font-weight: bold;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+}
 
     .student h3 {
       margin: 0 0 8px;
@@ -403,6 +425,68 @@
   color: #666;
   font-size: 14px;
 }
+
+    .open-login-button {
+  width: 100%;
+  padding: 14px 16px;
+  margin-bottom: 20px;
+  font-size: 16px;
+  font-weight: bold;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  background: white;
+  border: 1px solid #ddd;
+}
+
+    .student-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 12px;
+}
+
+.student-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #ddd;
+  background: #f5f1e8;
+  flex-shrink: 0;
+}
+
+.student-header-info {
+  flex: 1;
+  min-width: 0;
+}
+
+    .student-level-progress {
+  margin-top: 12px;
+}
+
+.student-level-progress-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  color: #666;
+  margin-bottom: 5px;
+}
+
+.student-level-progress-bar {
+  width: 100%;
+  height: 10px;
+  background: #e5e5e5;
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.student-level-progress-fill {
+  height: 100%;
+  width: 0%;
+  background: #287be8;
+  border-radius: 20px;
+}
     
   </style>
 </head>
@@ -416,7 +500,23 @@
 
 <main>
 
-  <div class="login-box" id="loginBox">
+  <button id="openLoginButton" class="open-login-button">
+  🔐 Login Pembina
+</button>
+
+  <div id="pembinaStatus" style="display: none;">
+  👤 Mode Pembina
+</div>
+
+<button
+  id="logoutButton"
+  class="open-login-button"
+  style="display: none;"
+>
+  🚪 Logout Pembina
+</button>
+  
+  <div class="login-box" id="loginBox" style="display: none;">
   <h2>🔐 Login Pembina</h2>
 
   <input
@@ -497,6 +597,14 @@
   Masuk sebagai Pembina
 </button>
 
+    <button
+  type="button"
+  id="closeLoginButton"
+  class="forgot-password"
+>
+  ✖ Tutup Login
+</button>
+    
 <button
   type="button"
   id="forgotPasswordButton"
@@ -676,6 +784,92 @@ const loginMessage = document.getElementById("loginMessage");
 const loginBox =
   document.getElementById("loginBox");
 
+  const openLoginButton =
+  document.getElementById("openLoginButton");
+
+  const logoutButton =
+  document.getElementById("logoutButton");
+
+const pembinaStatus =
+  document.getElementById("pembinaStatus");
+  
+openLoginButton.addEventListener("click", () => {
+
+  async function updateLoginUI() {
+
+  const {
+    data: { session }
+  } = await supabaseClient.auth.getSession();
+
+  if (session) {
+
+    loginBox.style.display = "none";
+    openLoginButton.style.display = "none";
+
+    pembinaStatus.style.display = "block";
+    logoutButton.style.display = "block";
+
+  } else {
+
+    loginBox.style.display = "none";
+    openLoginButton.style.display = "block";
+
+    pembinaStatus.style.display = "none";
+    logoutButton.style.display = "none";
+
+  }
+
+}
+
+  logoutButton.addEventListener("click", async () => {
+
+  const { error } =
+    await supabaseClient.auth.signOut();
+
+  if (error) {
+
+    console.error(error);
+
+    alert("❌ Gagal logout.");
+
+    return;
+  }
+
+  alert("✅ Berhasil logout.");
+
+  expPanel.style.display = "none";
+  historyPanel.style.display = "none";
+  profilePanel.style.display = "none";
+
+  await updateLoginUI();
+  await checkPembinaAccess();
+
+});
+  
+  loginBox.style.display = "block";
+
+  openLoginButton.style.display = "none";
+
+  loginBox.scrollIntoView({
+    behavior: "smooth",
+    block: "center"
+  });
+
+  const closeLoginButton =
+  document.getElementById("closeLoginButton");
+
+closeLoginButton.addEventListener("click", () => {
+
+  loginBox.style.display = "none";
+
+  openLoginButton.style.display = "block";
+
+  loginMessage.textContent = "";
+
+});
+  
+});
+  
 const resetBox =
   document.getElementById("resetBox");
 
@@ -1070,13 +1264,41 @@ loginButton.addEventListener("click", async () => {
   return;
 }
 
+  const { data: profile, error: profileError } =
+  await supabaseClient
+    .from("profiles")
+    .select("role")
+    .eq("id", data.user.id)
+    .single();
+
+if (profileError || !profile) {
+
+  await supabaseClient.auth.signOut();
+
   loginMessage.textContent =
-    "Login berhasil. Selamat datang Pembina!";
+    "❌ Profil Pembina tidak ditemukan.";
 
-  await loadStudents();
+  return;
+}
+
+if (profile.role !== "pembina") {
+
+  await supabaseClient.auth.signOut();
+
+  loginMessage.textContent =
+    "❌ Akun ini tidak memiliki akses sebagai Pembina.";
+
+  return;
+}
   
-  console.log("User login:", data.user);
+  loginMessage.textContent =
+  "Login berhasil. Selamat datang Pembina!";
 
+await updateLoginUI();
+await loadStudents();
+
+console.log("User login:", data.user);
+  
 });
 
   // ==========================================
@@ -1134,14 +1356,24 @@ classes.forEach(kelas => {
   classFilter.appendChild(option);
 });
 
+// ==========================================
+// LEADERBOARD SISWA
+// ==========================================
+
 const leaderboardList =
   document.getElementById("leaderboardList");
 
 leaderboardList.innerHTML = "";
 
+// Salin data lalu urutkan berdasarkan EXP terbesar
+const leaderboardData = [...data].sort((a, b) => {
+  return (Number(b.total_exp) || 0) - (Number(a.total_exp) || 0);
+});
+
 leaderboardData.forEach((student, index) => {
 
   const row = document.createElement("div");
+
   row.className = "leaderboard-item";
 
   let rank = (index + 1) + ".";
@@ -1160,8 +1392,8 @@ leaderboardData.forEach((student, index) => {
 
       <div class="leaderboard-meta">
         ${student.kelas || "-"} •
-        ⚡ ${student.total_exp} EXP •
-        ${student.badge}
+        ⚡ ${Number(student.total_exp) || 0} EXP •
+        ${student.badge || "-"}
       </div>
     </div>
   `;
@@ -1177,15 +1409,34 @@ leaderboardData.forEach((student, index) => {
       const card = document.createElement("div");
 
 card.className = "student";
+      
 card.dataset.kelas = student.kelas || "";
 
 card.innerHTML = `
-        <h3>${student.nama}</h3>
+  <div class="student-header">
 
-        <div>
-          ${student.kelas || ""}
-          ${student.regu ? " • Regu " + student.regu : ""}
-        </div>
+    ${
+      student.avatar
+        ? `<img
+            src="${student.avatar}"
+            class="student-avatar"
+            alt="Avatar ${student.nama}"
+          >`
+        : `<div class="student-avatar"></div>`
+    }
+
+    <div class="student-header-info">
+
+      <h3>${student.nama}</h3>
+
+      <div>
+        ${student.kelas || ""}
+        ${student.regu ? " • Regu " + student.regu : ""}
+      </div>
+
+    </div>
+
+  </div>
 
         <p class="exp">
           ⚡ ${student.total_exp} EXP
@@ -1199,7 +1450,16 @@ card.innerHTML = `
         <div>
           Badge: ${student.badge}
         </div>
-        
+
+  <div class="student-level-progress-bar">
+    <div
+      class="student-level-progress-fill"
+      style="width: ${levelProgress}%"
+    ></div>
+  </div>
+
+</div>
+
        <button
   class="manage-exp-button"
   data-id="${student.id_siswa}"
@@ -1616,6 +1876,7 @@ classFilter.addEventListener(
 );
 
 loadStudents();
+updateLoginUI();
 
   closeExpPanel.addEventListener("click", () => {
 
@@ -1633,10 +1894,33 @@ async function checkPembinaAccess() {
     data: { session }
   } = await supabaseClient.auth.getSession();
 
-  const isPembina = !!session;
+  let isPembina = false;
+
+  if (session) {
+
+    const { data: profile, error } =
+      await supabaseClient
+        .from("profiles")
+        .select("role")
+        .eq("id", session.user.id)
+        .single();
+
+    if (!error && profile) {
+      isPembina = profile.role === "pembina";
+    }
+  }
 
   document
     .querySelectorAll(".manage-exp-button")
+    .forEach(button => {
+
+      button.style.display =
+        isPembina ? "block" : "none";
+
+    });
+
+  document
+    .querySelectorAll(".delete-history-button")
     .forEach(button => {
 
       button.style.display =
