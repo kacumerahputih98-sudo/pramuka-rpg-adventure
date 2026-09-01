@@ -1408,7 +1408,7 @@ leaderboardData.forEach((student, index) => {
 
 card.className = "student";
       
-card.dataset.kelas = student.kelas || "";
+card.dataset.kelas = String(student.kelas || "").trim();
 
 card.innerHTML = `
   <div class="student-header">
@@ -1834,7 +1834,7 @@ function filterStudents() {
     searchInput.value.toLowerCase();
 
   const selectedClass =
-  classFilter.value.trim().toLowerCase();
+  classFilter.value;
 
   const cards =
     document.querySelectorAll(".student");
@@ -1847,7 +1847,7 @@ function filterStudents() {
         .toLowerCase();
 
     const studentClass =
-  (card.dataset.kelas || "").trim().toLowerCase();
+  (card.dataset.kelas || "").trim();
 
     const matchName =
       name.includes(keyword);
