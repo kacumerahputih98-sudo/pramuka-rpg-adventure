@@ -1511,45 +1511,49 @@ classes.forEach(kelas => {
 // LEADERBOARD SISWA
 // ==========================================
 
-const leaderboardList =
-  document.getElementById("leaderboardList");
+const leaderboardPageList =
+  document.getElementById("leaderboardPageList");
 
-leaderboardList.innerHTML = "";
+if (leaderboardPageList) {
 
-// Salin data lalu urutkan berdasarkan EXP terbesar
-const leaderboardData = [...data].sort((a, b) => {
-  return (Number(b.total_exp) || 0) - (Number(a.total_exp) || 0);
-});
+  leaderboardPageList.innerHTML = "";
 
-leaderboardData.forEach((student, index) => {
+  const leaderboardData = [...data].sort((a, b) => {
+    return (Number(b.total_exp) || 0) - (Number(a.total_exp) || 0);
+  });
 
-  const row = document.createElement("div");
+  leaderboardData.forEach((student, index) => {
 
-  row.className = "leaderboard-item";
+    const row = document.createElement("div");
+    row.className = "leaderboard-item";
 
-  let rank = (index + 1) + ".";
+    let rank = `${index + 1}`;
 
-  if (index === 0) rank = "🥇";
-  if (index === 1) rank = "🥈";
-  if (index === 2) rank = "🥉";
+    if (index === 0) rank = "🥇";
+    if (index === 1) rank = "🥈";
+    if (index === 2) rank = "🥉";
 
-  row.innerHTML = `
-    <div class="leaderboard-rank">
-      ${rank}
-    </div>
+    row.innerHTML = `
+      <div class="leaderboard-rank">${rank}</div>
 
-    <div class="leaderboard-info">
-      <strong>${student.nama}</strong>
+      <div class="leaderboard-info">
+        <strong>${student.nama || "-"}</strong>
 
-      <div class="leaderboard-meta">
-        ${student.kelas || "-"} •
-        ⚡ ${Number(student.total_exp) || 0} EXP •
-        ${student.badge || "-"}
+        <div class="leaderboard-meta">
+          ${student.kelas || "-"}
+          •
+          ⚡ ${Number(student.total_exp) || 0} EXP
+          •
+          ${student.badge || "-"}
+        </div>
       </div>
-    </div>
-  `;
+    `;
 
-  leaderboardList.appendChild(row);
+    leaderboardPageList.appendChild(row);
+
+  });
+
+}
 
 });
     
