@@ -1977,14 +1977,14 @@ async function checkPembinaAccess() {
   }
 
   document
-    .querySelectorAll(".manage-exp-button")
-    .forEach(button => {
+  .querySelectorAll(".manage-exp-button")
+  .forEach(button => {
 
-      button.style.display =
-        isPembina ? "block" : "none";
+    button.style.display =
+      isPembina ? "" : "none";
 
-    });
-
+  });
+  
   document
     .querySelectorAll(".delete-history-button")
     .forEach(button => {
