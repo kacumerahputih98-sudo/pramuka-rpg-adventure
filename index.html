@@ -860,10 +860,9 @@ openLoginButton.addEventListener("click", () => {
     logoutButton.style.display = "none";
 
   }
-
 }
 
-  logoutButton.addEventListener("click", async () => {
+openLoginButton.addEventListener("click", () => {
 
   const { error } =
     await supabaseClient.auth.signOut();
