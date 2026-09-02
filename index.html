@@ -1337,10 +1337,21 @@ if (profile.role !== "pembina") {
   "Login berhasil. Selamat datang Pembina!";
 
 await updateLoginUI();
+await loadStudents();
 
-setTimeout(() => {
-  window.location.reload();
-}, 700);
+document
+  .querySelectorAll(".manage-exp-button")
+  .forEach(button => {
+    button.style.display = "block";
+  });
+
+document
+  .querySelectorAll(".delete-history-button")
+  .forEach(button => {
+    button.style.display = "block";
+  });
+
+console.log("User login:", data.user);
   
 });
 
