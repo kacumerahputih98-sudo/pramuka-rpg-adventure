@@ -849,10 +849,6 @@
   <h2>🏆 Leaderboard Siswa</h2>
 
   <div id="leaderboardList"></div>
-
-  <button id="closeLeaderboardButton">
-  ← Kembali ke Daftar Siswa
-</button>
   
 </div>
   
@@ -865,12 +861,9 @@
   style="display: none;"
 >
 
-  <button
-    id="backFromLeaderboard"
-    class="back-button"
-  >
-    ← Kembali
-  </button>
+ <button id="backFromLeaderboard" class="back-button">
+  ↩️ Kembali ke Daftar Siswa
+</button>
 
   <div class="leaderboard-panel">
 
@@ -1977,16 +1970,37 @@ const classFilter = document.getElementById("classFilter");
   const openLeaderboardButton =
   document.getElementById("openLeaderboardButton");
 
-const leaderboardPanel =
-  document.getElementById("leaderboardPanel");
+const homePage =
+  document.getElementById("homePage");
+
+const leaderboardPage =
+  document.getElementById("leaderboardPage");
+
+const backFromLeaderboard =
+  document.getElementById("backFromLeaderboard");
 
 openLeaderboardButton.addEventListener("click", () => {
 
-  leaderboardPanel.style.display = "block";
+  homePage.style.display = "none";
 
-  leaderboardPanel.scrollIntoView({
-    behavior: "smooth",
-    block: "start"
+  leaderboardPage.style.display = "block";
+
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth"
+  });
+
+});
+
+backFromLeaderboard.addEventListener("click", () => {
+
+  leaderboardPage.style.display = "none";
+
+  homePage.style.display = "block";
+
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth"
   });
 
 });
