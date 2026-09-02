@@ -1337,9 +1337,10 @@ if (profile.role !== "pembina") {
   "Login berhasil. Selamat datang Pembina!";
 
 await updateLoginUI();
-await loadStudents();
 
-console.log("User login:", data.user);
+setTimeout(() => {
+  window.location.reload();
+}, 700);
   
 });
 
