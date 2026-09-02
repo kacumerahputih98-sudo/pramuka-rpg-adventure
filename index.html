@@ -503,6 +503,72 @@
   border-radius: 16px;
   box-shadow: 0 10px 40px rgba(0,0,0,0.3);
 }
+
+    .exp-panel h2 {
+  margin-top: 0;
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+.exp-student-name {
+  text-align: center;
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+
+.exp-form-group {
+  margin-bottom: 15px;
+}
+
+.exp-form-group label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 600;
+}
+
+.exp-form-group input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 15px;
+}
+
+.exp-action-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.exp-action-buttons button {
+  width: 100%;
+  padding: 11px;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.add-exp-button {
+  background: #dff5df;
+}
+
+.remove-exp-button {
+  background: #ffe1e1;
+}
+
+.close-exp-button {
+  width: 100%;
+  margin-top: 12px;
+  padding: 10px;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  cursor: pointer;
+}
     
   </style>
 </head>
@@ -638,37 +704,44 @@
 
   <h2>⚡ Kelola EXP</h2>
 
-  <p id="expStudentName"></p>
+<p id="expStudentName" class="exp-student-name"></p>
 
-    <label for="expAmount">Jumlah EXP</label>
+<div class="exp-form-group">
+  <label for="expAmount">Jumlah EXP</label>
 
-<input
-  type="number"
-  id="expAmount"
-  min="1"
-  placeholder="Contoh: 10"
->
+  <input
+    type="number"
+    id="expAmount"
+    min="1"
+    placeholder="Contoh: 10"
+  >
+</div>
 
+<div class="exp-form-group">
+  <label for="expReason">Alasan</label>
 
-<label for="expReason">Alasan</label>
+  <input
+    type="text"
+    id="expReason"
+    placeholder="Contoh: Menyelesaikan misi"
+  >
+</div>
 
-<input
-  type="text"
-  id="expReason"
-  placeholder="Contoh: Menyelesaikan misi"
->
-    
-  <button id="addExpButton">
+<div class="exp-action-buttons">
+
+  <button id="addExpButton" class="add-exp-button">
     ➕ Tambah EXP
   </button>
 
-  <button id="removeExpButton">
+  <button id="removeExpButton" class="remove-exp-button">
     ➖ Kurangi EXP
   </button>
 
-  <button id="closeExpPanel">
-    Tutup
-  </button>
+</div>
+
+<button id="closeExpPanel" class="close-exp-button">
+  ✖ Tutup
+</button>
 
 </div>
 
