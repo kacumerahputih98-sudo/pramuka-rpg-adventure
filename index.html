@@ -487,6 +487,18 @@
   background: #287be8;
   border-radius: 20px;
 }
+
+    .exp-panel {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: min(90%, 420px);
+  max-height: 90vh;
+  overflow-y: auto;
+  z-index: 9999;
+  box-sizing: border-box;
+}
     
   </style>
 </head>
@@ -1578,13 +1590,6 @@ document
         student.total_exp;
 
       expPanel.style.display = "block";
-
-      expPanel.scrollIntoView({
-        behavior: "smooth",
-        block: "center"
-      });
-
-    });
 
   });
 
