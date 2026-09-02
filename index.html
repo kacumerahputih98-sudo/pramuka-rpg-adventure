@@ -829,15 +829,18 @@ const loginBox =
   const openLoginButton =
   document.getElementById("openLoginButton");
 
-  const logoutButton =
+const logoutButton =
   document.getElementById("logoutButton");
 
 const pembinaStatus =
   document.getElementById("pembinaStatus");
-  
-openLoginButton.addEventListener("click", () => {
 
-  async function updateLoginUI() {
+
+// ==========================================
+// UPDATE TAMPILAN LOGIN PEMBINA
+// ==========================================
+
+async function updateLoginUI() {
 
   const {
     data: { session }
@@ -862,7 +865,46 @@ openLoginButton.addEventListener("click", () => {
   }
 }
 
+
+// ==========================================
+// BUKA LOGIN PEMBINA
+// ==========================================
+
 openLoginButton.addEventListener("click", () => {
+
+  loginBox.style.display = "block";
+  openLoginButton.style.display = "none";
+
+  loginBox.scrollIntoView({
+    behavior: "smooth",
+    block: "center"
+  });
+
+});
+
+
+// ==========================================
+// TUTUP LOGIN PEMBINA
+// ==========================================
+
+const closeLoginButton =
+  document.getElementById("closeLoginButton");
+
+closeLoginButton.addEventListener("click", () => {
+
+  loginBox.style.display = "none";
+  openLoginButton.style.display = "block";
+
+  loginMessage.textContent = "";
+
+});
+
+
+// ==========================================
+// LOGOUT PEMBINA
+// ==========================================
+
+logoutButton.addEventListener("click", async () => {
 
   const { error } =
     await supabaseClient.auth.signOut();
@@ -885,30 +927,6 @@ openLoginButton.addEventListener("click", () => {
   await updateLoginUI();
   await checkPembinaAccess();
 
-});
-  
-  loginBox.style.display = "block";
-
-  openLoginButton.style.display = "none";
-
-  loginBox.scrollIntoView({
-    behavior: "smooth",
-    block: "center"
-  });
-
-  const closeLoginButton =
-  document.getElementById("closeLoginButton");
-
-closeLoginButton.addEventListener("click", () => {
-
-  loginBox.style.display = "none";
-
-  openLoginButton.style.display = "block";
-
-  loginMessage.textContent = "";
-
-});
-  
 });
   
 const resetBox =
