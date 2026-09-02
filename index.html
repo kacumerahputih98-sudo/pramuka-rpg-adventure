@@ -489,15 +489,19 @@
 }
 
     .exp-panel {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: min(90%, 420px);
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  width: min(90%, 420px) !important;
   max-height: 90vh;
   overflow-y: auto;
-  z-index: 9999;
+  z-index: 99999 !important;
   box-sizing: border-box;
+  background: white;
+  padding: 20px;
+  border-radius: 16px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.3);
 }
     
   </style>
