@@ -625,6 +625,21 @@
   font-size: 15px;
   cursor: pointer;
 }
+
+    /* PANEL RIWAYAT & PROFIL - TIDAK LOMPAT SAAT DIBUKA */
+
+.history-panel,
+.profile-panel {
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  width: min(90%, 600px) !important;
+  max-height: 90vh;
+  overflow-y: auto;
+  z-index: 99998 !important;
+  box-sizing: border-box;
+}
     
   </style>
 </head>
@@ -1753,10 +1768,7 @@ document
 
       historyPanel.style.display = "block";
 
-      historyPanel.scrollIntoView({
-        behavior: "smooth",
-        block: "center"
-      });
+      
       
       const { data: logs, error } =
         await supabaseClient
@@ -2010,10 +2022,7 @@ profileLevel.textContent =
 
       profilePanel.style.display = "block";
 
-      profilePanel.scrollIntoView({
-        behavior: "smooth",
-        block: "center"
-      });
+    
 
     });
 
