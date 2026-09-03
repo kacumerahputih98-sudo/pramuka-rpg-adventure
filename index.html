@@ -1284,7 +1284,14 @@ async function saveExpTransaction(jenis) {
 
   expPanel.style.display = "none";
 
+  const currentScrollPosition = window.scrollY;
+
   await loadStudents();
+
+  window.scrollTo({
+    top: currentScrollPosition,
+    behavior: "instant"
+  });
 }
 
   addExpButton.addEventListener("click", () => {
