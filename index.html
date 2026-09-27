@@ -423,11 +423,39 @@
 }
 
 .leaderboard-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 0;
-  border-bottom: 1px solid #eee;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:12px 8px;
+  border-bottom:1px solid #eee;
+}
+
+.leaderboard-item:last-child {
+  border-bottom:none;
+}
+
+.leaderboard-rank {
+  width:42px;
+  flex:0 0 42px;
+  font-weight:bold;
+  font-size:18px;
+  text-align:center;
+}
+
+.leaderboard-info {
+  flex:1;
+  min-width:0;
+}
+
+.leaderboard-info strong {
+  display:block;
+  font-size:16px;
+  margin-bottom:3px;
+}
+
+.leaderboard-meta {
+  font-size:14px;
+  color:#666;
 }
 
 .leaderboard-rank {
@@ -507,20 +535,24 @@
   background: white;
 }
 
-    #openLeaderboardButton,
+   #openLeaderboardButton,
 .back-button {
   display: block;
   width: 100%;
   box-sizing: border-box;
-  padding: 14px 16px;
+  padding: 12px 14px;
   margin-bottom: 20px;
-  font-size: 16px;
+  font-size: 15px;
   font-weight: bold;
   border: 1px solid #ddd;
-  border-radius: 12px;
+  border-radius: 10px;
   cursor: pointer;
-  background: white;
+  background: #f5f1e8;
   color: #222;
+}
+
+.back-button:hover {
+  background: #eee7d8;
 }
     
 .back-button:hover {
@@ -959,16 +991,12 @@
 
     </div>
 
-<div
-  id="leaderboardPage"
-  style="display: none;"
->
-
- <button id="backFromLeaderboard" class="back-button">
-  ↩️ Kembali ke Daftar Siswa
-</button>
-
+<div id="leaderboardPage" style="display: none;">
   <div class="leaderboard-panel">
+
+    <button id="backFromLeaderboard" class="back-button">
+      ↩️ Kembali ke Daftar Siswa
+    </button>
 
     <h2>🏆 Leaderboard Siswa</h2>
 
@@ -979,7 +1007,6 @@
     <div id="leaderboardPageList"></div>
 
   </div>
-
 </div>
     
 </main>
