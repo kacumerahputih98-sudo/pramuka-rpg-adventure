@@ -409,6 +409,87 @@
   transition: width 0.5s ease;
 }
 
+.edit-panel {
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  width: min(90%, 520px) !important;
+  max-height: 90vh;
+  overflow-y: auto;
+  z-index: 99997 !important;
+  box-sizing: border-box;
+  background: white;
+  padding: 20px;
+  border-radius: 16px;
+  box-shadow: 0 10px 40px rgba(0,0,0,.3);
+}
+
+.edit-panel h2 {
+  margin-top: 0;
+  text-align: center;
+}
+
+.edit-form-group {
+  margin-bottom: 15px;
+}
+
+.edit-form-group label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 600;
+}
+
+.edit-form-group input,
+.edit-form-group select {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 15px;
+}
+
+.edit-photo-preview {
+  display: flex;
+  justify-content: center;
+  margin: 10px 0 20px;
+}
+
+.edit-photo-preview img {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 4px solid #ddd;
+  background: #f5f1e8;
+}
+
+.edit-action-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.edit-action-buttons button {
+  width: 100%;
+  padding: 11px;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.save-edit-button {
+  background: #dff5df;
+}
+
+.close-edit-button {
+  background: #f5f1e8;
+}
+    
 .leaderboard-panel {
   background: white;
   padding: 20px;
@@ -906,6 +987,70 @@
     alt="Avatar siswa"
   >
 </div>
+
+<div class="edit-panel" id="editPanel" style="display:none;">
+  <h2>✏️ Edit Siswa</h2>
+
+  <p id="editStudentName" class="exp-student-name"></p>
+
+  <div class="edit-photo-preview">
+    <img id="editPhotoPreview" src="" alt="Foto siswa">
+  </div>
+
+  <div class="edit-form-group">
+    <label for="editNama">Nama</label>
+    <input
+      type="text"
+      id="editNama"
+      placeholder="Nama siswa"
+    >
+  </div>
+
+  <div class="edit-form-group">
+    <label for="editKelas">Kelas</label>
+    <input
+      type="text"
+      id="editKelas"
+      placeholder="Contoh: VII A"
+    >
+  </div>
+
+  <div class="edit-form-group">
+    <label for="editRegu">Regu</label>
+    <input
+      type="text"
+      id="editRegu"
+      placeholder="Nama regu"
+    >
+  </div>
+
+  <div class="edit-form-group">
+    <label for="editFoto">Foto Siswa</label>
+    <input
+      type="file"
+      id="editFoto"
+      accept="image/*"
+    >
+  </div>
+
+  <div class="edit-action-buttons">
+    <button
+      id="saveEditStudentButton"
+      class="save-edit-button"
+    >
+      💾 Simpan Perubahan
+    </button>
+
+    <button
+      id="closeEditPanel"
+      class="close-edit-button"
+    >
+      ✖ Batal
+    </button>
+  </div>
+
+  <p id="editMessage"></p>
+</div>
     
   <h3 id="profileStudentName"></h3>
 
@@ -1165,6 +1310,185 @@ const resetMessage =
   const profilePanel =
   document.getElementById("profilePanel");
 
+const editPanel = document.getElementById("editPanel");
+const editStudentName = document.getElementById("editStudentName");
+const editPhotoPreview = document.getElementById("editPhotoPreview");
+const editNama = document.getElementById("editNama");
+const editKelas = document.getElementById("editKelas");
+const editRegu = document.getElementById("editRegu");
+const editFoto = document.getElementById("editFoto");
+const saveEditStudentButton = document.getElementById("saveEditStudentButton");
+const closeEditPanel = document.getElementById("closeEditPanel");
+const editMessage = document.getElementById("editMessage");
+
+let selectedEditStudentId = null;
+
+  editFoto.addEventListener("change", () => {
+  const file = editFoto.files[0];
+
+  if (!file) {
+    return;
+  }
+
+  if (!file.type.startsWith("image/")) {
+    alert("File harus berupa gambar.");
+    editFoto.value = "";
+    return;
+  }
+
+  if (file.size > 2 * 1024 * 1024) {
+    alert("Ukuran foto maksimal 2 MB.");
+    editFoto.value = "";
+    return;
+  }
+
+  editPhotoPreview.src = URL.createObjectURL(file);
+  editPhotoPreview.style.display = "block";
+});
+
+  saveEditStudentButton.addEventListener("click", async () => {
+  if (!selectedEditStudentId) {
+    return;
+  }
+
+  const nama = editNama.value.trim();
+  const kelas = editKelas.value.trim();
+  const regu = editRegu.value.trim();
+  const file = editFoto.files[0];
+
+  if (!nama) {
+    alert("Nama siswa tidak boleh kosong.");
+    editNama.focus();
+    return;
+  }
+
+  if (!kelas) {
+    alert("Kelas siswa tidak boleh kosong.");
+    editKelas.focus();
+    return;
+  }
+
+  const {
+    data: { session }
+  } = await supabaseClient.auth.getSession();
+
+  if (!session) {
+    alert("Silakan login sebagai Pembina terlebih dahulu.");
+    return;
+  }
+
+  saveEditStudentButton.disabled = true;
+  saveEditStudentButton.textContent = "⏳ Menyimpan...";
+
+  try {
+    // Cari data siswa saat ini
+    const currentStudent = data.find(
+      item => item.id_siswa === selectedEditStudentId
+    );
+
+    if (!currentStudent) {
+      throw new Error("Data siswa tidak ditemukan.");
+    }
+
+    let avatarUrl = currentStudent.avatar || null;
+    let uploadedFilePath = null;
+
+    // Jika Pembina memilih foto baru
+    if (file) {
+      const fileExt =
+        file.name.split(".").pop().toLowerCase();
+
+      uploadedFilePath =
+        `${selectedEditStudentId}/${Date.now()}.${fileExt}`;
+
+      const { error: uploadError } =
+        await supabaseClient.storage
+          .from("student-avatars")
+          .upload(
+            uploadedFilePath,
+            file,
+            {
+              cacheControl: "3600",
+              upsert: false
+            }
+          );
+
+      if (uploadError) {
+        throw uploadError;
+      }
+
+      const { data: publicUrlData } =
+        supabaseClient.storage
+          .from("student-avatars")
+          .getPublicUrl(uploadedFilePath);
+
+      avatarUrl = publicUrlData.publicUrl;
+    }
+
+    // Update data siswa
+    const { error: updateError } =
+      await supabaseClient
+        .from("Siswa")
+        .update({
+          nama: nama,
+          kelas: kelas,
+          regu: regu,
+          avatar: avatarUrl
+        })
+        .eq(
+          "id_siswa",
+          selectedEditStudentId
+        );
+
+    if (updateError) {
+      // Jika update database gagal setelah foto berhasil di-upload,
+      // hapus foto baru agar tidak meninggalkan file yatim.
+      if (uploadedFilePath) {
+        await supabaseClient.storage
+          .from("student-avatars")
+          .remove([uploadedFilePath]);
+      }
+
+      throw updateError;
+    }
+
+    alert("Data siswa berhasil diperbarui.");
+
+    editPanel.style.display = "none";
+
+    const currentScrollPosition = window.scrollY;
+
+    await loadStudents();
+
+    window.scrollTo({
+      top: currentScrollPosition,
+      behavior: "instant"
+    });
+
+  } catch (error) {
+    console.error("Gagal memperbarui siswa:", error);
+
+    alert(
+      "Gagal menyimpan perubahan siswa: " +
+      (error.message || "Terjadi kesalahan.")
+    );
+
+  } finally {
+    saveEditStudentButton.disabled = false;
+    saveEditStudentButton.textContent =
+      "💾 Simpan Perubahan";
+  }
+});
+
+  closeEditPanel.addEventListener("click", () => {
+  editPanel.style.display = "none";
+
+  editFoto.value = "";
+  editMessage.textContent = "";
+
+  selectedEditStudentId = null;
+});
+  
 const profileStudentName =
   document.getElementById("profileStudentName");
 
@@ -1761,6 +2085,10 @@ card.innerHTML = `
 >
   👤 Lihat Profil
 </button>
+
+<button class="edit-student-button" data-id="${student.id_siswa}">
+  ✏️ Edit Siswa
+</button>
       `;
 
       studentsContainer.appendChild(card);
@@ -2096,6 +2424,42 @@ profileLevel.textContent =
     
 }
 
+  document.querySelectorAll(".edit-student-button").forEach(button => {
+  button.addEventListener("click", () => {
+    const studentId = button.dataset.id;
+
+    const student = data.find(item => item.id_siswa === studentId);
+
+    if (!student) return;
+
+    selectedEditStudentId = studentId;
+
+    editStudentName.textContent =
+      `${student.nama || "-"} • ${student.id_siswa}`;
+
+    editNama.value = student.nama || "";
+    editKelas.value = student.kelas || "";
+    editRegu.value = student.regu || "";
+
+    editFoto.value = "";
+    editMessage.textContent = "";
+
+    if (student.avatar) {
+      editPhotoPreview.src = student.avatar;
+      editPhotoPreview.style.display = "block";
+    } else {
+      editPhotoPreview.removeAttribute("src");
+      editPhotoPreview.style.display = "none";
+    }
+
+    editPanel.style.display = "block";
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
+  });
+});
 
   const searchInput = document.getElementById("searchInput");
 const classFilter = document.getElementById("classFilter");
@@ -2231,6 +2595,10 @@ async function checkPembinaAccess() {
         isPembina ? "block" : "none";
 
     });
+
+document.querySelectorAll(".edit-student-button").forEach(button => {
+  button.style.display = isPembina ? "block" : "none";
+}); 
 }
   
 </script>
