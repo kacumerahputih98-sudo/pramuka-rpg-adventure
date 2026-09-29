@@ -988,6 +988,53 @@
   >
 </div>
 
+  <p id="editMessage"></p>
+</div>
+    
+  <h3 id="profileStudentName"></h3>
+
+  <p id="profileStudentId"></p>
+  <p id="profileStudentClass"></p>
+  <p id="profileStudentTeam"></p>
+
+  <div class="profile-exp">
+    ⚡ <span id="profileTotalExp"></span> EXP
+  </div>
+
+    <div class="profile-progress">
+  <div class="profile-progress-label">
+    <span>Progress Level</span>
+    <span id="profileProgressText"></span>
+  </div>
+
+  <div class="profile-progress-bar">
+    <div
+      id="profileProgressFill"
+      class="profile-progress-fill"
+    ></div>
+  </div>
+
+  <p id="profileNextLevel"></p>
+</div>
+    
+  <p>
+    🏅 Level <span id="profileLevel"></span>
+  </p>
+
+  <p>
+    🎖️ Gelar: <span id="profileGelar"></span>
+  </p>
+
+  <p>
+    🏆 Badge: <span id="profileBadge"></span>
+  </p>
+    
+  <button id="closeProfilePanel">
+    Tutup
+  </button>
+
+</div>
+
 <div class="edit-panel" id="editPanel" style="display:none;">
   <h2>✏️ Edit Siswa</h2>
 
@@ -1048,53 +1095,6 @@
       ✖ Batal
     </button>
   </div>
-
-  <p id="editMessage"></p>
-</div>
-    
-  <h3 id="profileStudentName"></h3>
-
-  <p id="profileStudentId"></p>
-  <p id="profileStudentClass"></p>
-  <p id="profileStudentTeam"></p>
-
-  <div class="profile-exp">
-    ⚡ <span id="profileTotalExp"></span> EXP
-  </div>
-
-    <div class="profile-progress">
-  <div class="profile-progress-label">
-    <span>Progress Level</span>
-    <span id="profileProgressText"></span>
-  </div>
-
-  <div class="profile-progress-bar">
-    <div
-      id="profileProgressFill"
-      class="profile-progress-fill"
-    ></div>
-  </div>
-
-  <p id="profileNextLevel"></p>
-</div>
-    
-  <p>
-    🏅 Level <span id="profileLevel"></span>
-  </p>
-
-  <p>
-    🎖️ Gelar: <span id="profileGelar"></span>
-  </p>
-
-  <p>
-    🏆 Badge: <span id="profileBadge"></span>
-  </p>
-    
-  <button id="closeProfilePanel">
-    Tutup
-  </button>
-
-</div>
   
   <div class="status" id="status">
     Menghubungkan ke database...
@@ -1322,6 +1322,7 @@ const closeEditPanel = document.getElementById("closeEditPanel");
 const editMessage = document.getElementById("editMessage");
 
 let selectedEditStudentId = null;
+let studentsData = [];
 
   editFoto.addEventListener("change", () => {
   const file = editFoto.files[0];
@@ -1382,9 +1383,9 @@ let selectedEditStudentId = null;
 
   try {
     // Cari data siswa saat ini
-    const currentStudent = data.find(
-      item => item.id_siswa === selectedEditStudentId
-    );
+    const currentStudent = studentsData.find(
+  item => item.id_siswa === selectedEditStudentId
+);
 
     if (!currentStudent) {
       throw new Error("Data siswa tidak ditemukan.");
@@ -1948,6 +1949,8 @@ console.log("User login:", data.user);
     status.textContent =
   "Berhasil memuat " + data.length + " siswa.";
 
+studentsData = data;
+    
 const classes = [
   ...new Set(
     data
