@@ -2426,33 +2426,53 @@ profileLevel.textContent =
 
   document.querySelectorAll(".edit-student-button").forEach(button => {
   button.addEventListener("click", () => {
+
     const studentId = button.dataset.id;
 
-    const student = data.find(item => item.id_siswa === studentId);
+    const student = data.find(
+      item => item.id_siswa === studentId
+    );
 
-    if (!student) return;
+    if (!student) {
+      alert("Data siswa tidak ditemukan.");
+      return;
+    }
 
     selectedEditStudentId = studentId;
 
-    editStudentName.textContent =
-      `${student.nama || "-"} • ${student.id_siswa}`;
+    const panel = document.getElementById("editPanel");
+    const studentName = document.getElementById("editStudentName");
+    const photoPreview = document.getElementById("editPhotoPreview");
+    const namaInput = document.getElementById("editNama");
+    const kelasInput = document.getElementById("editKelas");
+    const reguInput = document.getElementById("editRegu");
+    const fotoInput = document.getElementById("editFoto");
+    const message = document.getElementById("editMessage");
 
-    editNama.value = student.nama || "";
-    editKelas.value = student.kelas || "";
-    editRegu.value = student.regu || "";
-
-    editFoto.value = "";
-    editMessage.textContent = "";
-
-    if (student.avatar) {
-      editPhotoPreview.src = student.avatar;
-      editPhotoPreview.style.display = "block";
-    } else {
-      editPhotoPreview.removeAttribute("src");
-      editPhotoPreview.style.display = "none";
+    if (!panel) {
+      alert("Panel Edit Siswa belum ditemukan.");
+      return;
     }
 
-    editPanel.style.display = "block";
+    studentName.textContent =
+      `${student.nama || "-"} • ${student.id_siswa}`;
+
+    namaInput.value = student.nama || "";
+    kelasInput.value = student.kelas || "";
+    reguInput.value = student.regu || "";
+
+    fotoInput.value = "";
+    message.textContent = "";
+
+    if (student.avatar) {
+      photoPreview.src = student.avatar;
+      photoPreview.style.display = "block";
+    } else {
+      photoPreview.removeAttribute("src");
+      photoPreview.style.display = "none";
+    }
+
+    panel.style.display = "block";
 
     window.scrollTo({
       top: 0,
